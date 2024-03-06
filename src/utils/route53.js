@@ -12,6 +12,8 @@ export const changeResourceRecordSet = ({
   const connector = new Connector({ debug });
 
   const put = (uow) => {
+    if(!uow[requestField]) return _(Promise.resolve(uow));
+
     const putPromise = connector.changeResourceRecordSet(uow[requestField])
       .then((response) => ({ ...uow, [responseField]: response }))
       .catch(rejectWithFault(uow));

@@ -42,6 +42,10 @@ class Model {
 // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/route-53/command/ChangeResourceRecordSetsCommand/
 export const toChangeResourceRecordSetRequest = (uow) => {
   const { host, ip } = uow.event.raw.new;
+  const { host: oldHost = null, ip: oldIp = null } = uow.event.raw.old || {};
+
+  if(host === oldHost && ip === oldIp) return undefined;
+
   return {
     ChangeBatch: {
       Changes: [

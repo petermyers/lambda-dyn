@@ -37,7 +37,7 @@ This will build a zip file with built binaries as well as some install and unins
 
 ```
 cd ~
-cp LambdaDyn/.pkg/lambdadyn-client.zip
+cp lambda-dyn/.pkg/lambdadyn-client.zip
 unzip lambdadyn-client.zip -d client
 
 cd client

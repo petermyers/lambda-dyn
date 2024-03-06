@@ -1,0 +1,11 @@
+name: aws
+architecture: arm64
+deploymentBucket: ${file(serverless/aws/cfn.yml):deploymentBucket}
+iam:
+  role: ${file(serverless/aws/iam.yml):role}
+kmsKeyArn: ${file(serverless/aws/kms.yml):output.masterKeyArn}
+runtime: nodejs20.x
+logRetentionInDays: ${file(serverless/params.yml):${opt:stage}.logRetentionInDays}
+endpointType: REGIONAL
+environment: ${file(serverless/environment.yml)}
+apiGateway: ${file(serverless/aws/apigw.yml):provider}

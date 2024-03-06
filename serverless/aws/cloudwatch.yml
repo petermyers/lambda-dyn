@@ -1,0 +1,48 @@
+output:
+
+resources:
+  Resources:
+    FaultMonitorLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        LogGroupName: /aws/events/${self:service}-${opt:stage}-faults
+        RetentionInDays: ${file(serverless/params.yml):${opt:stage}.logRetentionInDays}
+    FaultMonitorLogsBusPolicy:
+      Type: AWS::Logs::ResourcePolicy
+      Properties:
+        PolicyName: ${self:service}-${opt:stage}-fault-monitor-resource-policy
+        PolicyDocument: 
+          Fn::Sub: 
+            - >
+              {
+                "Version": "2012-10-17",
+                "Statement": [{
+                  "Effect": "Allow",
+                  "Principal": {
+                    "Service": [
+                      "events.amazonaws.com",
+                      "delivery.logs.amazonaws.com"
+                    ]
+                  },
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [ "${FaultMonitorLogGroupArn}" ]
+                }]
+              }
+            - FaultMonitorLogGroupArn:
+                Fn::GetAtt: [ FaultMonitorLogGroup, Arn ]
+
+    FaultMonitorBusRule:
+      Type: AWS::Events::Rule
+      Properties:
+        EventBusName: ${file(serverless/aws/event-bus.yml):output.eventBusName}
+        EventPattern:
+          detail-type: 
+            - 'fault'
+        State: ENABLED
+        Targets:
+          - Id: FaultMonitorLogGroup
+            Arn:
+              Fn::GetAtt: [ FaultMonitorLogGroup, Arn ]

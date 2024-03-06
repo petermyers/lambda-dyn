@@ -1,0 +1,5 @@
+{
+  "main": "./.client-webpack/main.js",
+  "output": "./.client-webpack/sea-prep.blob",
+  "disableExperimentalSEAWarning": true
+}

@@ -1,0 +1,6 @@
+role:
+  statements:
+    - ${file(serverless/aws/event-bus.yml):iamRoleStatements}
+    - ${file(serverless/aws/dynamodb.yml):iamRoleStatements}
+    - ${file(serverless/aws/kms.yml):iamRoleStatements}
+    - ${file(serverless/aws/route-53.yml):iamRoleStatements}

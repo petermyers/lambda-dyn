@@ -1,0 +1,52 @@
+output:
+  tableName:
+    Fn::Select: [1, Fn::Split: [ '/', Fn::GetAtt: [ EntitiesTable, Arn ] ] ]
+
+  tableArn:
+    Fn::GetAtt: [ EntitiesTable, Arn ]
+
+  tableStreamArn:
+    Fn::GetAtt: [ EntitiesTable, StreamArn ]
+
+iamRoleStatements:
+  Effect: Allow
+  Action:
+    - dynamodb:Query
+    - dynamodb:GetItem
+    - dynamodb:UpdateItem
+    - dynamodb:PutItem
+    - dynamodb:DeleteItem
+    - dynamodb:Scan
+    - dynamodb:BatchGetItem
+  Resource:
+    - Fn::GetAtt: [ EntitiesTable, Arn ]
+
+resources:
+  Resources:
+    EntitiesTable:
+      # Type: AWS::DynamoDB::GlobalTable
+      Type: AWS::DynamoDB::Table
+      # DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:service}-${opt:stage}-entities
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: sk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH
+          - AttributeName: sk
+            KeyType: RANGE
+        # Replicas:
+        #   - Region: ${opt:region} # If using replicas, list regional replicas here in additional region entries
+            # Tags: ${file(serverless/aws/tags.yml):dynamoDbTags}
+        BillingMode: PAY_PER_REQUEST
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+        # SSESpecification:
+        #   SSEEnabled: true

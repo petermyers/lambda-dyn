@@ -40,7 +40,7 @@ class Model {
 }
 
 // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/route-53/command/ChangeResourceRecordSetsCommand/
-export const toChangeResourceRecordSetRequest = (uow) => {
+export const toUpdateResourceRecordSetRequest = (uow) => {
   const { host, ip } = uow.event.raw.new;
   const { host: oldHost = null, ip: oldIp = null } = uow.event.raw.old || {};
 
@@ -51,6 +51,31 @@ export const toChangeResourceRecordSetRequest = (uow) => {
       Changes: [
         {
           Action: "UPSERT",
+          ResourceRecordSet: {
+            Type: "A",
+            TTL: 60,
+            Name: host,
+            ResourceRecords: [
+              { Value: ip }
+            ]
+          }
+        }
+      ],
+      Comment: `Updated by lambda-dyn at ${new Date().toLocaleDateString()}`
+    }
+  };
+};
+
+export const toRemoveResourceRecordSetRequest = (uow) => {
+  const { host, ip } = uow.event.raw.old;
+
+  if(!host || !ip) return undefined;
+
+  return {
+    ChangeBatch: {
+      Changes: [
+        {
+          Action: "DELETE",
           ResourceRecordSet: {
             Type: "A",
             TTL: 60,
